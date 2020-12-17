@@ -1,7 +1,7 @@
 [Demo] https://bicycle-reports.wn.r.appspot.com/
 
 ![Preview of Bicycle Reports](static/bicyclereportspreview.png "Preview of Bicycle Reports")
-![Video of Bicycle Reports](static/HCDE-Bicycle-Reports.mp4 "Video of Bicycle Reports")
+![Video of Bicycle Reports](https://www.youtube.com/watch?v=q80NuuSIvxE&feature=youtu.be "Video of Bicycle Reports")
 
 Bicycle Reports is a web app created with the goal of helping bike riders navigate their
 local areas. By showing incidents around a searched location, users may use their best
