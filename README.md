@@ -2,7 +2,7 @@
 
 ![Preview of Bicycle Reports](static/bicyclereportspreview.png "Preview of Bicycle Reports")
 ![Video of Bicycle Reports](https://www.youtube.com/watch?v=q80NuuSIvxE&feature=youtu.be "Video of Bicycle Reports")
-
+![Watch the video](https://img.youtube.com/vi/q80NuuSIvxE/maxresdefault.jpg)](https://youtu.be/q80NuuSIvxE)
 Bicycle Reports is a web app created with the goal of helping bike riders navigate their
 local areas. By showing incidents around a searched location, users may use their best
 judgment in deciding if an area is deemed safe or not. Similarly, other users may find
