@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+		<link rel="icon" type="images/png" sizes="16x16" href="images/favicon.png"/>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="author" content="yehgen">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>About Bicycle Reports</title>
+
+		<!-- bootstrap cdns -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+		<!-- stylesheet -->
+		<link rel="stylesheet" href="../static/style.css">
+	</head>
+	
+	<body>
+		<div class="wrapper">
+			<!-- navigation start -->
+			<nav>
+        <span id="brand">
+          <a href="{{ url_for('main_handler') }}">
+						<img src="{{ url_for('static', filename='sitelogo.png') }}" id="logo" alt="Bicycle inside Location Logo">
+						Bicycle Reports
+					</a>
+				</span>
+
+				<ul class="menu">
+					<li><a href="{{ url_for('about') }}">ABOUT<span></span></a></li>
+				</ul>
+
+				<div id="toggle">
+					<div class="span">menu</div>
+				</div>
+			</nav>
+
+			<div id="resize">
+				<div class="close-btn">close</div>
+				<ul class="menu">
+					<li><a href="{{ url_for('main_handler') }}">HOME<span></span></a></li>
+					<li><a href="{{ url_for('about') }}">ABOUT<span></span></a></li>
+				</ul>
+			</div>
+			<!-- navigation end -->
+
+			<div class="container">
+				<br><br><br>
+				<div class="hero">
+					<div class="row space">
+						<div class="col-lg-4">
+							<p>
+								Hello! This is a personal project for my HCDE310: Interactive Systems Design and Technology
+								course showing various bike incidents utilizing the 
+								<a class="api-link" href="https://bikewise.org/">Bikewise API</a> 
+								around a given location using the
+								<a class="api-link" href="https://developers.google.com/maps/documentation">Google Maps API</a>. 
+							</p>
+							<p>
+								Feel free to alert me of any troubles or issues. I will sort 
+								out the few interface problems eventually, but I hope that the data and 
+								information is valuable and presented in an understandable manner.
+							</p>
+						</div>
+
+						<div class="col-lg-8">
+							<p>
+								This application was created to allow bike riders to scout the area they are in
+								and determine if it is "safe." My primary motivation began with allowing bike riders
+								to understand if the vicinity was safe to lock up their bike for an extended period
+								of time by seeing if there are any nearby thefts. As I expanded this project, I
+								added the ability to search other incidents such as hazards and crashes to allow 
+								bike riders to be more alert about their routes and any potential troubles or 
+								danger.
+							</p>
+							<p>
+								"Bikespotters" are encouraged to cross reference this web app and assist owners
+								in their search for stolen bikes. There are many success stories on Bike Index
+								and the community is very supportive, so this web app may serve as a tool for
+								"bikespotters" to see if any bikes they see have been reported.
+							</p>
+						</div>
+					</div>
+	
+					<div class="row space">
+						<div class="col-lg-4">
+							<h3>Have a report?</h3>
+							<p>Report any problems at <a class="api-link" href="https://bikeindex.org/">Bike Index</a>.</p>
+						</div>
+
+						<div class="col-lg-8">
+							<p>
+								I am aware about a few troubles, however they are due to the nature of the
+								Bikewise API. Attempts that result in older information tend to lack descriptions
+								and I am thus unable to show any relevant information. I have added text to these
+								markers on the map to indicate the issue. One possible solution is to filter all 
+								results based on their age and sort from there, however, because I am unable to 
+								know if these incidents are resolved, I have chosen to keep them within this web 
+								app for complete clarity and visibility	as a precaution. (yes the footer is a bit
+								janky, especially for mobile, but it was not a focus in this project).
+							</p>
+						</div>
+					</div>
+	
+					<div class="row space">
+						<div class="col-lg-12">
+							<h3>Next Steps for Bicycle Reports</h3>
+							<ul>
+								<li><del>Allow users to use their current location</del></li>
+								<li><del>Offer advanced searching (different incident types and search tags)</del></li>
+								<li><del>Visually display incidents via maps</del>></li>
+								<li>Tidy up the user interface</li>
+								<li>Improve the user experience</li>
+								<li>Drastically enhance runtime by refactoring code</li>
+								<li>Improve mobile responsitivity, currently responsive but not perfect</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- footer -->
+			<div class="footer abt-ft">
+				<div class="container">
+					<br>
+					<div class="row">
+						<div class="col-lg-3" id="personal">
+							<p><a href="http://generousyeh.com/">© 2020 Generous Yeh</a></p>
+						</div>
+
+						<div class="col-lg-5">
+							<p><a href="http://generousyeh.com/">Questions or suggestions? Reach out!</a></p>
+						</div>
+
+						<div class="col-lg-4" id="code">
+							<p><a href="https://github.com/yehgen">peek the code on git</a></p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- footer -->
+		</div>
+
+		<!-- greensock cdn -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.2/TweenMax.min.js"></script>
+		<script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+		<script type="text/javascript">
+		
+		// navigation
+		$("#toggle").click(function() {
+			$(this).toggleClass('on');
+			$("#resize").toggleClass("active");
+			$(".span").toggleClass('hid');
+		});
+
+		$("#resize ul li a").click(function() {
+			$(this).toggleClass('on');
+			$("#resize").toggleClass("active");
+		});
+
+		$(".close-btn").click(function() {
+			$(this).toggleClass('on');
+			$("#resize").toggleClass("active");
+			$(".span").toggleClass('hid');
+		});
+		// navigation
+
+		// nav animation
+		TweenMax.from("#brand", 1, {
+			delay: 0.4,
+			y: 10,
+			opacity: 0,
+			ease: Expo.easeInOut
+		})
+
+		TweenMax.staggerFrom(".menu li a", 1, {
+			delay: 0.4,
+			opacity: 0,
+			ease: Expo.easeInOut
+		}, 0.1);
+		// nav animation ends
+
+		</script>
+	</body>
+</html>

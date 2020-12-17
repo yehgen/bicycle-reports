@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+		<!-- <link rel="icon" type="images/png" sizes="16x16" href="images/favicon.png"/> -->
+		<link rel="icon" href="{{ url_for('static', filename='favicon.png') }}">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="author" content="yehgen">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>{% if incidents %}Incidents for {{proximity}}{% else %}Bicycle Reports{% endif %}</title>
+
+		<!-- bootstrap cdns -->
+		<!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"> -->
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.css') }}" />
+
+		<!-- basic stylesheet and script -->
+		<!-- <link rel="stylesheet" href="style.css"> -->
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" />
+		<script src="{{ url_for('static', filename='index.js') }}"></script>
+
+		<!-- for dropdowns and other anim -->
+		<script src="{{ url_for('static', filename='jq.min.js') }}"></script>
+		<script src="{{ url_for('static', filename='bootstrap.bundle.min.js') }}"></script>
+
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAck61zK-4nC_YUfU21_45mnlm9d-7FyIE" type="text/javascript"></script>
+		<!-- <script src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap" type="text/javascript"></script> -->
+	</head>
+	
+	<body>
+		<div class="wrapper">
+			<!-- navigation start -->
+			<nav>
+        <span id="brand">
+          <a href="{{ url_for('main_handler') }}">
+						<img src="{{ url_for('static', filename='sitelogo.png') }}" id="logo" alt="Bicycle inside Location Logo">
+					</a>
+					<a href="{{ url_for('main_handler') }}" id="head-toggle">
+						Bicycle Reports
+					</a>
+				</span>
+
+				<ul class="menu">
+					<li><a href="{{ url_for('about') }}">ABOUT<span></span></a></li>
+				</ul>
+
+				<div id="toggle">
+					<div class="span">menu</div>
+				</div>
+			</nav>
+
+			<div id="resize">
+				<div class="close-btn">close</div>
+				<ul class="menu">
+					<li><a href="{{ url_for('main_handler') }}">HOME<span></span></a></li>
+					<li><a href="{{ url_for('about') }}">ABOUT<span></span></a></li>
+				</ul>
+			</div>
+			<!-- navigation end -->
+
+			<div class="container ui-box">
+				<br><br><br>
+				<div>
+					<div class="row">
+						<div class="col-lg-12 input-group">
+							<form id="search-form" class="col-lg-12" action="" method="post">
+								<input type="text" id="loc" name="loc" placeholder="Enter a location or zip code (i.e. Seattle, 98105...)">
+								<button id="search-location" type="submit button" class="btn">Search</button>
+
+								<div class="row">
+									<div class="col-lg-6 current-loc">
+										<button id="curr-loc" class="adv-btn btn" type="button">Use Current Location</button>
+										<button id="adv-srch" class="adv-btn btn" type="button">Advanced Options</button>
+									</div>
+								</div>
+
+								<div id="adv-srch-rvl" class="row hid">
+									<div class="adv-row">
+										<label for="textInput">Search term(s): </label>
+										<input type="text" id="query" name="query" placeholder="Enter any search tags (color, model, year, etc)">
+									</div>
+
+									<div class="adv-row">
+										<label for="textInput">Incident Type: </label>
+										<select name="incident" id="incident" class="btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> 
+											<option class="dropdown-item active" value="theft">Theft (default)</option>
+											<option value="crash">Crash</option>
+											<option value="hazard">Hazard</option>
+											<option value="unconfirmed">Unconfirmed</option>
+											<option value="infrastructure_issue">Infrastructure Issue</option>
+											<option value="chop_shop">Chop Shop</option>
+										</select>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+
+					{% if prompt %}
+					<div class='prompt'>{{prompt}}</div>
+					{% endif %}
+
+					{% if theftData %}
+					{% set lat = mapData["results"][0]["geometry"]["location"]["lat"] %}
+					{% set lng = mapData["results"][0]["geometry"]["location"]["lng"] %}
+
+					<div id="incidents">
+						<h2 class="divider">Incidents around "{{loc}}"</h2>
+						<p id="subtext">
+							*areas that are darker red show multiple incidents at the area. 
+							it is impossible to distinguish between markers at these locations
+							if they are the exact same location (i.e. multiple stolen bicycles
+							from one household), but do note these areas are more likely prone to incidents*
+						</p>
+						{% if theftData["incidents"] == [] %}
+							{% if query and incident_type %}
+							<h2>No {{incident_type}} incidents found around {{loc}} containing {{query}}.</h2>
+							{% elif query %}
+							<h2>No incidents found around {{loc}} containing {{query}}.</h2>
+							{% elif incident_type %}
+							<h2>No {{incident_type}} incidents found around {{loc}}.</h2>
+							{% else %}
+							<h2>No incidents found around {{loc}}.</h2>
+							{% endif %}
+						{% endif %}
+
+						<div id="map"></div>
+						{% set locList = [] %}
+						{% set markerTitle = [] %}
+						{% set markerImage = [] %}
+
+						{% for incident in locData["features"] %}
+							{{ locList.append(incident["geometry"]["coordinates"]) or '' }}
+							{{ markerTitle.append(incident["properties"]["title"]) or '' }}
+
+							{% if incident["properties"]["description"] %}
+								{{ markerImage.append(incident["properties"]["description"]) or '' }}
+							{% else %}
+								{{ markerImage.append("No further information available. Please see complete descriptions below. Due to how old this report is, the API lacks a complete description and this messes with the results. I am aware of this problem.") or '' }}
+							{% endif %}
+						{% endfor %}
+
+						{% for incident in theftData["incidents"] %}
+						<div class="row bike-info divider">
+							<div class="col-lg-4">
+								{% if incident["media"]["image_url"] %}
+								<image src='{{incident["media"]["image_url_thumb"]}}' class='img-thumb' alt='Image of {{incident["title"]}}'></image>
+								{% else %}
+								<image src="{{ url_for('static', filename='noimage.png') }}" alt='No image provided.'></image>
+								{% endif %}
+							</div>
+	
+							<div class="col-lg-8">
+								<h3>{{incident["title"]}}</h3>
+
+								{% if incident["description"] %}
+								<p>{{incident["description"]}}</p> 
+								{% else %}
+								<p>No description available.</p>
+								{% endif %}
+
+								<p>
+									Reported on {{incident["occurred_at"] | ctime}}
+									in {{incident["address"]}}
+								</p>
+	
+								<a href='{{incident["source"]["html_url"]}}'>
+									<button type="button" class="listing btn">See Original Listing on BikeIndex</button>
+								</a>
+							</div>
+						</div>
+						{% endfor %}
+					</div>
+					{% endif %}
+				</div>
+			</div>
+			<!-- footer -->
+			<div class="footer">
+				<div class="container">
+					<br>
+					<div class="row">
+						<div class="col-lg-3" id="personal">
+							<p><a href="http://generousyeh.com/">© 2020 Generous Yeh</a></p>
+						</div>
+
+						<div class="col-lg-5">
+							<p><a href="http://generousyeh.com/">Questions or suggestions? Reach out!</a></p>
+						</div>
+
+						<div class="col-lg-4" id="code">
+							<p><a href="https://github.com/yehgen">peek the code on git</a></p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- footer -->
+		</div>
+
+		<!-- for map markers -->
+		<script type="text/javascript">
+			var locList = {{ locList | safe }};
+			var markerTitle = {{ markerTitle | safe }};
+			var markerImage = {{ markerImage | safe }};
+
+			var map = new google.maps.Map(document.getElementById("map"), {
+				zoom: 12,
+				center: new google.maps.LatLng({{lat}}, {{lng}}),
+				mapTypeId: google.maps.MapTypeId.ROADMAP
+			});
+
+			var infowindow = new google.maps.InfoWindow();
+			var marker, i;
+
+			for (i = 0; i < locList.length; i++) {  
+				marker = new google.maps.Marker({
+					position: new google.maps.LatLng(locList[i][1], locList[i][0]),
+					icon: "static/areamapmarker.png",
+					map: map
+				});
+
+				google.maps.event.addListener(marker, "click", (function(marker, i) {
+					return function() {
+						infowindow.setContent("<h3>" + markerTitle[i] + "</h3>" + "<div id='mrkr-spc'>" + markerImage[i] + "</div>");
+						infowindow.open(map, marker);
+					}
+				})(marker, i));
+			}
+		</script>
+		<!-- for map markers -->
+
+    <!-- greensock cdn -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.2/TweenMax.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <script type="text/javascript">
+
+    // navigation
+    $("#toggle").click(function() {
+      $(this).toggleClass('on');
+      $("#resize").toggleClass("active");
+			$(".span").toggleClass('hid');
+    });
+
+    $("#resize ul li a").click(function() {
+      $(this).toggleClass('on');
+      $("#resize").toggleClass("active");
+    });
+
+    $(".close-btn").click(function() {
+      $(this).toggleClass('on');
+      $("#resize").toggleClass("active");
+			$(".span").toggleClass('hid');
+    });
+    // navigation
+
+    // nav animation
+    TweenMax.from("#brand", 1, {
+      delay: 0.4,
+      y: 10,
+      opacity: 0,
+      ease: Expo.easeInOut
+    })
+
+    TweenMax.staggerFrom(".menu li a", 1, {
+      delay: 0.4,
+      opacity: 0,
+      ease: Expo.easeInOut
+    }, 0.1);
+    // nav animation ends
+    </script>
+	</body>
+</html>
